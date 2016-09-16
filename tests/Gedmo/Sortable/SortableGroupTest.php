@@ -13,7 +13,7 @@ use Sortable\Fixture\Transport\Engine;
 use Sortable\Fixture\Transport\Reservation;
 
 /**
- * These are tests for sluggable behavior
+ * These are tests for sortable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @link http://www.gediminasm.org

@@ -72,7 +72,7 @@ class SortableTest extends BaseTestCaseORM
             $node->setPath("/");
             $this->em->persist($node);
         }
-        $this->em->flush();  
+        $this->em->flush();
 
         $repo = $this->em->getRepository(self::NODE);
 
@@ -89,7 +89,7 @@ class SortableTest extends BaseTestCaseORM
         $node = $repo->findOneByPosition(9);
         $this->assertNotNull($node);
         $this->assertEquals('Node1', $node->getName());
-    
+
     }
 
     /**
@@ -789,6 +789,87 @@ class SortableTest extends BaseTestCaseORM
         $this->em->flush();
 
         $this->assertEquals(4, $nodes[4]->getPosition());
+    }
+
+    /**
+     * @test
+     */
+    public function testManualPositionUpdateWithNewEntityInsertion()
+    {
+        /**
+         * @var $node1 Node
+         */
+        $node1 = $this->em->find(self::NODE, $this->nodeId);
+
+        $node2 = new Node();
+        $node2->setName('Node2');
+        $node2->setPath('/');
+        $this->em->persist($node2);
+
+        $node3 = new Node();
+        $node3->setName('Node3');
+        $node3->setPath('/');
+        $this->em->persist($node3);
+
+        $this->em->flush();
+
+        $this->assertEquals(0, $node1->getPosition());
+        $this->assertEquals(1, $node2->getPosition());
+        $this->assertEquals(2, $node3->getPosition());
+
+        $node4 = new Node();
+        $node4->setName('Node4');
+        $node4->setPath('/');
+        $node4->setPosition(0);
+        $this->em->persist($node4);
+
+        $node1->setPosition(1);
+        $node2->setPosition(2);
+        $node3->setPosition(3);
+
+        $this->em->flush();
+
+        $this->assertEquals(1, $node1->getPosition());
+        $this->assertEquals(2, $node2->getPosition());
+        $this->assertEquals(3, $node3->getPosition());
+        $this->assertEquals(0, $node4->getPosition());
+    }
+
+    /**
+     * @test
+     */
+    public function testManualPositionUpdate()
+    {
+        /**
+         * @var $node1 Node
+         */
+        $node1 = $this->em->find(self::NODE, $this->nodeId);
+
+        $node2 = new Node();
+        $node2->setName('Node2');
+        $node2->setPath('/');
+        $this->em->persist($node2);
+
+        $node3 = new Node();
+        $node3->setName('Node3');
+        $node3->setPath('/');
+        $this->em->persist($node3);
+
+        $this->em->flush();
+
+        $this->assertEquals(0, $node1->getPosition());
+        $this->assertEquals(1, $node2->getPosition());
+        $this->assertEquals(2, $node3->getPosition());
+
+        $node1->setPosition(2);
+        $node2->setPosition(0);
+        $node3->setPosition(1);
+
+        $this->em->flush();
+
+        $this->assertEquals(2, $node1->getPosition());
+        $this->assertEquals(0, $node2->getPosition());
+        $this->assertEquals(1, $node3->getPosition());
     }
 
     protected function getUsedEntityFixtures()
